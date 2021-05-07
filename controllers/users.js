@@ -14,7 +14,15 @@ const getUserById = (req, res) => {
       }
       return res.send(user);
     })
-    .catch(() => res.status(500).send({ message: 'Ошибка по умолчанию' }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({
+          message: 'Переданы некорректные данные',
+        });
+      } else {
+        res.status(500).send({ message: 'Ошибка по умолчанию' });
+      }
+    });
 };
 
 const createUser = (req, res) => {
@@ -34,9 +42,14 @@ const createUser = (req, res) => {
 
 const updateUser = (req, res) => {
   User.findByIdAndUpdate(req.user._id,
-    { name: req.body.name,
-      about: req.body.about },
-    { new: true })
+    {
+      name: req.body.name,
+      about: req.body.about,
+    },
+    {
+      new: true,
+      runValidators: true,
+    })
     .then((user) => {
       if (!user) {
         return res.status(404).send({ message: 'Пользователь с указанным _id не найден' });
@@ -56,7 +69,10 @@ const updateUser = (req, res) => {
 const updateAvatar = (req, res) => {
   User.findByIdAndUpdate(req.user._id,
     { avatar: req.body.avatar },
-    { new: true })
+    {
+      new: true,
+      runValidators: true,
+    })
     .then((user) => {
       if (!user) {
         return res.status(404).send({ message: 'Пользователь с указанным _id не найден' });

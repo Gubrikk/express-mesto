@@ -14,7 +14,15 @@ const deleteCard = (req, res) => {
       }
       return res.send(card);
     })
-    .catch(() => res.status(500).send({ message: 'Ошибка по умолчанию' }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({
+          message: 'Переданы некорректные данные',
+        });
+      } else {
+        res.status(500).send({ message: 'Ошибка по умолчанию' });
+      }
+    });
 };
 
 const createCard = (req, res) => {
@@ -36,11 +44,14 @@ const likeCard = (req, res) => {
   Card.findByIdAndUpdate(req.params.cardId,
     { $addToSet: { likes: req.user._id } },
     { new: true })
-    .then(() => {
-      res.send('Лайк поставлен');
+    .then((data) => {
+      if (!data) {
+        return res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
+      }
+      return res.send('Лайк поставлен');
     })
     .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
+      if (err.name === 'CastError') {
         res.status(400).send({
           message: 'Переданы некорректные данные для постановки лайка',
         });
@@ -58,9 +69,9 @@ const dislikeCard = (req, res) => {
       res.send('Лайк удален');
     })
     .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
+      if (err.name === 'CastError') {
         res.status(400).send({
-          message: 'Переданы некорректные данные для снятия лайка',
+          message: 'Переданы некорректные данные для постановки лайка',
         });
       } else {
         res.status(500).send({ message: 'Ошибка по умолчанию' });

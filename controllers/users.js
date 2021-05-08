@@ -54,7 +54,7 @@ const updateUser = (req, res) => {
       if (!user) {
         return res.status(404).send({ message: 'Пользователь с указанным _id не найден' });
       }
-      return res.send('Данные профиля обновлены');
+      return res.send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
@@ -77,7 +77,7 @@ const updateAvatar = (req, res) => {
       if (!user) {
         return res.status(404).send({ message: 'Пользователь с указанным _id не найден' });
       }
-      return res.send('Аватар обновлен');
+      return res.send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {

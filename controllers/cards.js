@@ -44,11 +44,11 @@ const likeCard = (req, res) => {
   Card.findByIdAndUpdate(req.params.cardId,
     { $addToSet: { likes: req.user._id } },
     { new: true })
-    .then((data) => {
-      if (!data) {
+    .then((card) => {
+      if (!card) {
         return res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
       }
-      return res.send('Лайк поставлен');
+      return res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -65,8 +65,8 @@ const dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(req.params.cardId,
     { $pull: { likes: req.user._id } },
     { new: true })
-    .then(() => {
-      res.send('Лайк удален');
+    .then((card) => {
+      res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
